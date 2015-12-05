@@ -48,7 +48,6 @@ class BaseHandler(webapp2.RequestHandler):
 
     @webapp2.cached_property
     def session(self):
-        """Shortcut to access the current session."""
         return self.session_store.get_session(backend="datastore")
 
     def render_template(self, view_filename, params={}):
@@ -58,22 +57,17 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.out.write(template.render(path, params))
 
     def display_message(self, message):
-        """Utility function to display a template with a simple message."""
         params = {
             'message': message
         }
         self.render_template('message.html', params)
 
-    # this is needed for webapp2 sessions to work
     def dispatch(self):
-        # Get a session store for this request.
         self.session_store = sessions.get_store(request=self.request)
 
         try:
-            # Dispatch the request.
             webapp2.RequestHandler.dispatch(self)
         finally:
-            # Save all sessions.
             self.session_store.save_sessions(self.response)
 
 
@@ -116,99 +110,6 @@ class SignupHandler(BaseHandler):
         self.redirect(self.uri_for('home'))
 
 
-# class ForgotPasswordHandler(BaseHandler):
-#     def get(self):
-#         self._serve_page()
-#
-#     def post(self):
-#         username = self.request.get('username')
-#
-#         user = self.user_model.get_by_auth_id(username)
-#         if not user:
-#             logging.info('Could not find any user entry for username %s', username)
-#             self._serve_page(not_found=True)
-#             return
-#
-#         user_id = user.get_id()
-#         token = self.user_model.create_signup_token(user_id)
-#
-#         verification_url = self.uri_for('verification', type='p', user_id=user_id,
-#                                         signup_token=token, _full=True)
-#
-#         msg = 'Send an email to user in order to reset their password. \
-#           They will be able to do so by visiting <a href="{url}">{url}</a>'
-#
-#         self.display_message(msg.format(url=verification_url))
-#
-#     def _serve_page(self, not_found=False):
-#         username = self.request.get('username')
-#         params = {
-#             'username': username,
-#             'not_found': not_found
-#         }
-#         self.render_template('forgot.html', params)
-#
-#
-# class VerificationHandler(BaseHandler):
-#     def get(self, *args, **kwargs):
-#         user = None
-#         user_id = kwargs['user_id']
-#         signup_token = kwargs['signup_token']
-#         verification_type = kwargs['type']
-#
-#         user, ts = self.user_model.get_by_auth_token(int(user_id), signup_token,
-#                                                      'signup')
-#
-#         if not user:
-#             logging.info('Could not find any user with id "%s" signup token "%s"',
-#                          user_id, signup_token)
-#             self.abort(404)
-#
-#         # store user data in the session
-#         self.auth.set_session(self.auth.store.user_to_dict(user), remember=True)
-#
-#         if verification_type == 'v':
-#             # remove signup token, we don't want users to come back with an old link
-#             self.user_model.delete_signup_token(user.get_id(), signup_token)
-#
-#             if not user.verified:
-#                 user.verified = True
-#                 user.put()
-#
-#             self.display_message('User email address has been verified.')
-#             return
-#         elif verification_type == 'p':
-#             # supply user to the page
-#             params = {
-#                 'user': user,
-#                 'token': signup_token
-#             }
-#             self.render_template('resetpassword.html', params)
-#         else:
-#             logging.info('verification type not supported')
-#             self.abort(404)
-
-
-class SetPasswordHandler(BaseHandler):
-    @user_required
-    def post(self):
-        password = self.request.get('password')
-        old_token = self.request.get('t')
-
-        if not password or password != self.request.get('confirm_password'):
-            self.display_message('passwords do not match')
-            return
-
-        user = self.user
-        user.set_password(password)
-        user.put()
-
-        # remove signup token, we don't want users to come back with an old link
-        self.user_model.delete_signup_token(user.get_id(), old_token)
-
-        self.display_message('Password updated')
-
-
 class LoginHandler(BaseHandler):
     def get(self):
         self.__serve_page()
@@ -239,13 +140,8 @@ class LogoutHandler(BaseHandler):
         self.redirect(self.uri_for('home'))
 
 
-class AuthenticatedHandler(BaseHandler):
-    @user_required
-    def get(self):
-        self.render_template('authenticated.html')
-
-
 class UploadImageHandler(BaseHandler):
+    @user_required
     def post(self):
         user = self.user
         image = self.request.get('file')
