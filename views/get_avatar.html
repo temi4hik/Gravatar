@@ -1,0 +1,25 @@
+{% extends "main.html" %}
+
+{% block maincontent %}
+<form action="/get_avatar" method="post" enctype="multipart/form-data" target="_blank">
+    <label for="user_email">
+        Input email of user you'd like to get avatar of
+    </label>
+    <input type="email" name="user_email" id="user_email">
+    <br>
+
+    <label for="size">Input size of avatar you'd like to get. <br>
+    If you set no size, you get default size of avatar
+    </label>
+    <input type="number" name="size" id="size">
+    <br>
+    <label for="avatar_url">
+        Optionally, you can enter url of some another picture and <br>
+        if there are no users with such e-mail we'll make you an avatar from it
+    </label>
+    <input type="url" name="avatar_url" id="avatar_url">
+
+    <input type="submit" value="Find avatar!">
+</form>
+
+{% endblock %}

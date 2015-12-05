@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>{% block title %}Gravatar{% endblock %}</title>
+    <style>
+        input {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="content">
+    <h1>Welcome to gravatar!</h1>
+    <h2>This service allows you to upload your avatars and request avatars of others!</h2>
+
+    {% block maincontent %}
+
+    {% endblock %}
+</div>
+
+<div>
+    <footer>
+        <hr/>
+        <p>
+            {% if not user %}
+            <a href="/login">Login</a>
+            {% else %}
+            Logged in as <span style="background-color: OldLace">{{ user.name }}</span> | <a href="/logout">Logout</a>
+            {% endif %}
+            |
+            <a href="/">Home</a>
+            |
+            <a href="/signup">New user</a>
+            <!--|-->
+            <!--<a href="/authenticated">Secured page</a> (you can see this after login)-->
+            |
+            <a href="/get_avatar">Get avatar</a>
+        </p>
+    </footer>
+</div>
+
+
+</body>
+</html>

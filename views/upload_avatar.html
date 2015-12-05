@@ -1,0 +1,19 @@
+{% extends "main.html" %}
+
+{% block maincontent %}
+
+<h1>Hi, {{ user.name }}</h1>
+Here is your avatar. <br>
+<img height="300px" width="300px"> <br>
+<!--{{ user.user_avatar.full_size_image }}-->
+<div>{{ user.user_avatar.full_size_image }}</div>
+You can upload another one if you want to.<br>
+Notice, that the image cannot be larger than 32Mb <br><br>
+
+<form action="" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" id="file">
+    <br>
+    <input type="submit" value="Upload new avatar" name="submit">
+</form>
+
+{% endblock %}

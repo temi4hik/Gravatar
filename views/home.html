@@ -1,0 +1,22 @@
+{% extends "main.html" %}
+
+{% block maincontent %}
+
+{% if not user %}
+
+<p>Try it out by registering <a href="/signup">here</a> or log in <a href=""></a> .</p>
+
+{% else %}
+<h1>Hi, {{ user.name }}</h1>
+<a href="/user_avatar" target="_blank">Here </a>is your avatar. <br>
+You can upload another one if you want to.<br>
+Notice, that the image cannot be larger than 32Mb <br><br>
+
+<form action="/upload_avatar" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" id="file">
+    <br>
+    <input type="submit" value="Upload new avatar" name="submit">
+</form>
+{% endif %}
+
+{% endblock %}
